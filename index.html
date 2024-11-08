@@ -5,19 +5,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Gameloop</title>
-    <link rel="preload" as="style" onload="this.rel = 'stylesheet'" href="./src/style.css">
-    <noscript>
-        <link rel="stylesheet" href='./src/style.css'>
-    </noscript>
+    <link rel="stylesheet" href="./src/style.css">
+    <link rel="preload" href="./src/script.js" as="script">
 </head>
 
 <body>
     <div class="gameloop-logo" id="gameloop-logo">
-        <img class="gameloop-logo-sequence" id="gameloop-logo-sequence"
-            src="static/images/interactive-logo/Normal_open_0.png" alt="gameloop-logo">
+        <img class="gameloop-logo-sequence" id="gameloop-logo-sequence" src="static/images/interactive-logo/Normal_open_0.png" alt="gameloop-logo">
     </div>
 
-    <script src="./src/script.js"></script>
+    <!-- <script src="./src/script.js"></script> -->
+    <script>
+        var scriptJS = document.createElement('script');
+        scriptJS.src = './src/script.js';  
+        document.body.appendChild(scriptJS)
+    </script>
 </body>
 
 </html>
