@@ -78,18 +78,28 @@ function onWindowMessage(event) {
     }
 }
 
+function preloadImages(totalFrames) {
+    const promises = [];
+    for (let i = 0; i < totalFrames; i++) {
+        const img = new Image();
+        img.src = `static/images/interactive-logo/Normal_open_${i}.png`;
+        promises.push(img.decode());
+    }
+    return Promise.all(promises);
+}
+
 function animateLogo() {
     const gameloopLogo = document.getElementById('gameloop-logo-sequence')
     const frameRate = 30
     const totalFrames = 54
     let currentFrame = 0
 
-    function updateFrame() {
-        gameloopLogo.src = `static/images/interactive-logo/Normal_open_${currentFrame}.png`
-        if (currentFrame < totalFrames - 1) {
-            currentFrame++
-        }
-    }
-
-    setInterval(updateFrame, frameRate)
+    preloadImages(totalFrames).then(() => {
+        setInterval(() => {
+            gameloopLogo.src = `static/images/interactive-logo/Normal_open_${currentFrame}.png`;
+            if (currentFrame < totalFrames - 1) {
+                currentFrame++;
+            }
+        }, frameRate);
+    });
 }
