@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Mon, 03 Mar 2025 21:29:36 GMT
+ * Generated: Mon, 03 Mar 2025 21:32:27 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -14669,7 +14669,7 @@ var APP_com_domain_app_sampleGame = (function () {
   class App extends lng.Component {
     constructor() {
       super(...arguments);
-      _defineProperty$1(this, "button", this.getByRef("Button"));
+      _defineProperty$1(this, "button", this.getByRef("TestColumn"));
       _defineProperty$1(this, "Text", this.getByRef("Text"));
     }
     static getFonts() {
@@ -14731,7 +14731,12 @@ var APP_com_domain_app_sampleGame = (function () {
           return this.button;
         }
         _handleEnter() {
-          GLMainBridge$1.requestAds();
+          if (this.button.selectedIndex == 0) {
+            console.log("button 1 pressed");
+            GLMainBridge$1.requestAds();
+          } else {
+            console.log("button 2 pressed");
+          }
           // TODO add background music
           // Mute game
         }
