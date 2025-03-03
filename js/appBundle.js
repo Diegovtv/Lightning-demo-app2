@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Mon, 03 Mar 2025 19:45:42 GMT
+ * Generated: Mon, 03 Mar 2025 21:29:36 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -13096,10 +13096,129 @@ var APP_com_domain_app_sampleGame = (function () {
       })
   });
 
-  Object.freeze({
+  var styles$n = Object.freeze({
       __proto__: null,
       base: base$n
   });
+
+  class Column extends NavigationManager {
+      static get __componentName() {
+          return "Column";
+      }
+      static get __themeStyle() {
+          return styles$n;
+      }
+      static _template() {
+          return _objectSpread(_objectSpread({}, super._template()), {}, {
+              direction: "column"
+          });
+      }
+      _isOnScreenForScrolling(child) {
+          if (!child) return false;
+          var y = getY(child);
+          if (!Number.isFinite(y)) return false;
+          var itemsTransitionY = this.getTransitionYTargetValue();
+          var columnY = this.core.renderContext.py;
+          var itemY = columnY + itemsTransitionY + y;
+          var yModifier;
+          if (child.transition("y")) {
+              yModifier = child.y - child.transition("y").targetValue;
+              itemY = itemY - yModifier;
+          }
+          return itemY >= columnY && itemY + child.h <= columnY + this.h;
+      }
+      _shouldScroll() {
+          if (this.alwaysScroll) {
+              return true;
+          }
+          var shouldScroll = false;
+          if (!this.neverScroll) {
+              var isCompletelyOnScreen = this._isOnScreenForScrolling(this.selected);
+              var lastChild = this.Items.childList.last;
+              shouldScroll = lastChild && (this.shouldScrollUp() || this.shouldScrollDown() || !isCompletelyOnScreen);
+          }
+          if (this.selectedIndex < this.scrollIndex) {
+              shouldScroll = false;
+          }
+          return shouldScroll;
+      }
+      _getScrollY() {
+          var itemsContainerY;
+          var itemIndex = this.selectedIndex - this.scrollIndex;
+          itemIndex = itemIndex < 0 ? 0 : itemIndex;
+          if (itemIndex === this._firstFocusableIndex()) {
+              itemIndex = 0;
+          }
+          if (this.Items.children[itemIndex]) {
+              itemsContainerY = this.Items.children[itemIndex].transition("y") ? -this.Items.children[itemIndex].transition("y").targetValue + this.itemPosY : -this.Items.children[itemIndex].y + this.itemPosY;
+          }
+          return itemsContainerY;
+      }
+      _render(next, prev) {
+          this._prevLastScrollIndex = this._lastScrollIndex;
+          if (this.plinko && prev && prev.selected && !(this.items.indexOf(prev) === 0 && prev.skipPlinko)) {
+              var prevPlinko = this.checkSkipPlinko(prev, next);
+              next.selectedIndex = this._getIndexOfItemNear(next, prevPlinko || prev);
+          } else if (next && !next.selectedIndex) {
+              next.selectedIndex = 0;
+          }
+          var itemsContainerY;
+          if (!this.Items.children.length) {
+              itemsContainerY = this.itemPosY;
+          } else if (this._shouldScroll()) {
+              itemsContainerY = this._getScrollY();
+          }
+          if (itemsContainerY !== undefined) {
+              this.updatePositionOnAxis(this.Items, itemsContainerY);
+          }
+          this.onScreenEffect(this.onScreenItems);
+      }
+      _performRender() {
+          this._render(this.selected, this.prevSelected);
+      }
+      checkSkipPlinko(prev, next) {
+          if (!prev || !prev.skipPlinko || [ 0, this.items.length - 1 ].includes(this.items.indexOf(prev))) {
+              return null;
+          }
+          var prevIndex = this.items.indexOf(prev);
+          var direction = prevIndex - this.items.indexOf(next);
+          var up = direction > 0;
+          var prevItems = up ? this.items.slice(prevIndex).map((i => ({
+              skipPlinko: i.skipPlinko,
+              index: this.items.indexOf(i)
+          }))) : this.items.slice(0, prevIndex + 1).map((i => ({
+              skipPlinko: i.skipPlinko,
+              index: this.items.indexOf(i)
+          }))).reverse();
+          var endOfMultiSkipPlinkos = prevItems.find((i => i.skipPlinko && !this.items[i.index + direction].skipPlinko));
+          var prevPlinkoIndex = endOfMultiSkipPlinkos ? endOfMultiSkipPlinkos.index + direction : prevIndex + direction;
+          return this.items[prevPlinkoIndex];
+      }
+      get _itemsY() {
+          return getY(this.Items);
+      }
+      $removeItem(item) {
+          if (item) {
+              var wasSelected = item === this.selected;
+              this.Items.childList.remove(item);
+              this.queueRequestUpdate();
+              if (wasSelected || this.selectedIndex >= this.items.length) {
+                  this.selectedIndex = this._selectedIndex;
+              }
+              if (!this.items.length) {
+                  this.fireAncestors("$columnEmpty");
+              }
+          }
+      }
+      $columnChanged() {
+          this.queueRequestUpdate();
+      }
+      _isOnScreen(child) {
+          if (!child) return false;
+          return this._isComponentVerticallyVisible(child);
+      }
+      onScreenEffect() {}
+  }
 
   var base$m = theme => {
       var paddingX = theme.spacer.lg;
@@ -14567,12 +14686,26 @@ var APP_com_domain_app_sampleGame = (function () {
           color: 0xfffbb03b,
           src: Utils.asset("images/background.png")
         },
-        Button: {
-          mount: 0.5,
+        TestColumn: {
+          type: Column,
+          w: 500,
+          h: 500,
           x: 1920 / 2,
           y: 1080 / 2,
-          title: "Show Add",
-          type: Button
+          mount: 0.5,
+          items: [{
+            mount: 0.5,
+            // x: 1920 / 2,
+            // y: 1080 / 2,
+            title: "Show Ad 1",
+            type: Button
+          }, {
+            mount: 0.5,
+            // x: 1920 / 2,
+            // y: 1080 / 2,
+            title: "Show Ad 2",
+            type: Button
+          }]
         },
         Text: {
           mount: 0.5,
@@ -14588,6 +14721,8 @@ var APP_com_domain_app_sampleGame = (function () {
       };
     }
     _init() {
+      window.focus();
+      window.parent.postMessage('loaded', '*');
       this._setState("ButtonFocused");
     }
     static _states() {
@@ -14601,6 +14736,9 @@ var APP_com_domain_app_sampleGame = (function () {
           // Mute game
         }
       }];
+    }
+    _handleBack() {
+      window.parent.postMessage('close', '*');
     }
   }
 
