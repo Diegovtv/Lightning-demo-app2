@@ -1,19 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <style>
+            html {height: 100%; width: 100%;}
+            *,body {margin:0; padding:0;}
+            canvas { position: absolute; z-index: 2; }
+            body { width: 100%; height: 100%;}
+        </style>
+    </head>
+    <body>
+        <script src="./js/lightning.min.js"></script>
+        <script src="./js/appBundle.js"></script>
 
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gameloop</title>
-    <link rel="stylesheet" href="./src/style.css">
-</head>
+        <script>
+            const appSettings = {
+  "stage": {
+    "clearColor": "0x00000000",
+    "useImageWorker": true
+  },
+  "debug": false,
+  "name": "sampleGame",
+  "identifier": "com.domain.app.sampleGame",
+  "version": "1.0.0",
+  "icon": "./static/icon.png",
+  "id": "com.domain.app.sampleGame"
+}
 
-<body>
-    <div class="gameloop-logo" id="gameloop-logo">
-        <img class="gameloop-logo-sequence" id="gameloop-logo-sequence" src="static/images/interactive-logo/Normal_open_0.png" alt="gameloop-logo">
-    </div>
+            const platformSettings = {
+  "path": "./static",
+  "log": true,
+  "showVersion": true
+}
 
-    <script src="./src/script.js"></script>
-</body>
+            const appData = {}
 
+            let bundle = window.APP_com_domain_app_sampleGame
+            // support rollup and esbuild
+            if (typeof bundle !== 'function') {
+              bundle = bundle.default
+            }
+
+            const app = bundle(appSettings, platformSettings, appData)
+            document.body.appendChild(app.stage.getCanvas())
+
+        </script>
+    </body>
 </html>
