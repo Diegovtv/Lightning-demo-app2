@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Tue, 04 Mar 2025 16:55:38 GMT
+ * Generated: Tue, 04 Mar 2025 17:34:39 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -14580,8 +14580,42 @@ var APP_com_domain_app_sampleGame = (function () {
       this.audio.loop = true;
       this.audio.volume = 0.5;
       this.setMusicPause(true);
+    }
+    _active() {
       GLMainBridge.addEventListener('adsStarted', () => {
         console.warn("### App | Ads started");
+        this.setMusicPause(false);
+        this.Label.patch({
+          text: {
+            text: "Ad started"
+          }
+        });
+      });
+      GLMainBridge.addEventListener('adsInProgress', () => {
+        console.warn("### App | Ads in progress");
+        this.Label.patch({
+          text: {
+            text: "Ad in progress"
+          }
+        });
+      });
+      GLMainBridge.addEventListener('adsSkipped', () => {
+        console.warn("### App | Ads skipped");
+        this.setMusicPause(true);
+        this.Label.patch({
+          text: {
+            text: "No ads available / ads skipped"
+          }
+        });
+      });
+      GLMainBridge.addEventListener('adsCompleted', () => {
+        console.warn("### App | Ads completed");
+        this.setMusicPause(true);
+        this.Label.patch({
+          text: {
+            text: "Ads completed"
+          }
+        });
       });
     }
     updateLabel(message) {
@@ -14611,16 +14645,8 @@ var APP_com_domain_app_sampleGame = (function () {
             }
           });
           setTimeout(() => {
-            this.setMusicPause(false);
-            this.Label.patch({
-              text: {
-                text: "Showing Ad"
-              }
-            });
-
-            // setTimeout(() => {
-            //     GLMainBridge.requestAds();
-            // }, 1000);
+            console.log("Posting message to parent");
+            window.parent.postMessage("adOpportunity", "*");
           }, 1000);
         }
       }];
