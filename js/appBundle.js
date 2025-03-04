@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Tue, 04 Mar 2025 16:48:09 GMT
+ * Generated: Tue, 04 Mar 2025 16:52:20 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -14580,6 +14580,9 @@ var APP_com_domain_app_sampleGame = (function () {
       this.audio.loop = true;
       this.audio.volume = 0.5;
       this.setMusicPause(true);
+      GLMainBridge.addEventListener('adsStarted', () => {
+        console.warn("### App | Ads started");
+      });
     }
     updateLabel(message) {
       this.Label.patch({
@@ -14614,9 +14617,7 @@ var APP_com_domain_app_sampleGame = (function () {
                 text: "Showing Ad"
               }
             });
-            GLMainBridge.addEventListener('adsStarted', () => {
-              console.warn("### App | Ads started");
-            });
+
             // setTimeout(() => {
             //     GLMainBridge.requestAds();
             // }, 1000);
