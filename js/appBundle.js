@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Tue, 04 Mar 2025 16:52:20 GMT
+ * Generated: Tue, 04 Mar 2025 16:55:38 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -14525,7 +14525,7 @@ var APP_com_domain_app_sampleGame = (function () {
 
   function addEventListener(event, listener) {
     window.addEventListener('message', messageEvent => {
-      if (messageEvent == "GLMain.ads.".concat(event)) {
+      if (messageEvent.data === "GLMain.ads.".concat(event)) {
         listener();
       }
     });
