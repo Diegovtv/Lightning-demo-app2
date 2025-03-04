@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Tue, 04 Mar 2025 17:59:43 GMT
+ * Generated: Tue, 04 Mar 2025 18:23:11 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -14531,13 +14531,11 @@ var APP_com_domain_app_sampleGame = (function () {
       window.parent.postMessage("adOpportunity", "*");
     }
     function addEventListener(event, callback) {
-      if (window.addEventListener) {
-        window.addEventListener("GLMain." + event, callback);
-      } else if (window.attachEvent) {
-        window.attachEvent("GLMain." + event, callback);
-      } else {
-        console.warn("Event listener not supported.");
-      }
+      window.addEventListener('message', function (messageEvent) {
+        if (messageEvent.data === "GLMain." + event) {
+          callback();
+        }
+      });
     }
     var GMLainBridge = {
       requestAds: requestAds,
