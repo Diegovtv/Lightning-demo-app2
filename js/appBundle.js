@@ -3,7 +3,7 @@
  * SDK version: 5.5.4
  * CLI version: 2.14.2
  * 
- * Generated: Tue, 04 Mar 2025 17:34:39 GMT
+ * Generated: Tue, 04 Mar 2025 17:59:43 GMT
  */
 
 var APP_com_domain_app_sampleGame = (function () {
@@ -14523,16 +14523,33 @@ var APP_com_domain_app_sampleGame = (function () {
       }
   }
 
-  function addEventListener(event, listener) {
-    window.addEventListener('message', messageEvent => {
-      if (messageEvent.data === "GLMain.ads.".concat(event)) {
-        listener();
+  var GLMainBridge$1 = {exports: {}};
+
+  (function (module) {
+
+    function requestAds() {
+      window.parent.postMessage("adOpportunity", "*");
+    }
+    function addEventListener(event, callback) {
+      if (window.addEventListener) {
+        window.addEventListener("GLMain." + event, callback);
+      } else if (window.attachEvent) {
+        window.attachEvent("GLMain." + event, callback);
+      } else {
+        console.warn("Event listener not supported.");
       }
-    });
-  }
-  var GLMainBridge = {
-    addEventListener
-  };
+    }
+    var GMLainBridge = {
+      requestAds: requestAds,
+      addEventListener: addEventListener
+    };
+    if (module.exports) {
+      module.exports = GMLainBridge;
+    } else if (typeof window !== "undefined") {
+      window.GMLainBridge = GMLainBridge;
+    }
+  })(GLMainBridge$1);
+  var GLMainBridge = GLMainBridge$1.exports;
 
   class App extends lng.Component {
     constructor() {
@@ -14580,42 +14597,27 @@ var APP_com_domain_app_sampleGame = (function () {
       this.audio.loop = true;
       this.audio.volume = 0.5;
       this.setMusicPause(true);
+      this._setupListeners();
     }
-    _active() {
-      GLMainBridge.addEventListener('adsStarted', () => {
+    _setupListeners() {
+      GLMainBridge.addEventListener("ads.started", () => {
         console.warn("### App | Ads started");
         this.setMusicPause(false);
-        this.Label.patch({
-          text: {
-            text: "Ad started"
-          }
-        });
+        this.updateLabel("Ad Started");
       });
-      GLMainBridge.addEventListener('adsInProgress', () => {
+      GLMainBridge.addEventListener("ads.inProgress", () => {
         console.warn("### App | Ads in progress");
-        this.Label.patch({
-          text: {
-            text: "Ad in progress"
-          }
-        });
+        this.updateLabel("Ad In Progress");
       });
-      GLMainBridge.addEventListener('adsSkipped', () => {
+      GLMainBridge.addEventListener("ads.skipped", () => {
+        console.warn("### App | Ads skipped / aborted");
+        this.updateLabel("Ad Skipped");
+        this.setMusicPause(true);
+      });
+      GLMainBridge.addEventListener("ads.completed", () => {
         console.warn("### App | Ads skipped");
+        this.updateLabel("Ad Finished");
         this.setMusicPause(true);
-        this.Label.patch({
-          text: {
-            text: "No ads available / ads skipped"
-          }
-        });
-      });
-      GLMainBridge.addEventListener('adsCompleted', () => {
-        console.warn("### App | Ads completed");
-        this.setMusicPause(true);
-        this.Label.patch({
-          text: {
-            text: "Ads completed"
-          }
-        });
       });
     }
     updateLabel(message) {
@@ -14645,7 +14647,7 @@ var APP_com_domain_app_sampleGame = (function () {
             }
           });
           setTimeout(() => {
-            console.log("Posting message to parent");
+            console.log("Sending ad opportunity to parent");
             window.parent.postMessage("adOpportunity", "*");
           }, 1000);
         }
